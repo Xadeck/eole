@@ -1,3 +1,5 @@
+workspace(name = "xdk_eole")
+
 load("//:WORKSPACE.bzl", "dependencies")
 
 dependencies()
