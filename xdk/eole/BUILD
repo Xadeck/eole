@@ -53,8 +53,6 @@ cc_test(
     data = glob(["testdata/**"]),
     deps = [
         ":project",
-        "@com_github_gflags_gflags//:gflags",
-        "@com_google_glog//:glog",
-        "@com_google_googletest//:gtest",
+        "@com_google_googletest//:gtest_main",
     ],
 )

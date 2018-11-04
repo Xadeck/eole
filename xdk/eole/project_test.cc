@@ -3,8 +3,6 @@
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/strip.h"
-#include "gflags/gflags.h"
-#include "glog/logging.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -71,11 +69,3 @@ TEST_F(ProjectTest, Works) {
 } // namespace
 } // namespace eole
 } // namespace xdk
-
-int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  ::google::InitGoogleLogging(argv[0]);
-  ::gflags::ParseCommandLineFlags(&argc, &argv, true);
-
-  return RUN_ALL_TESTS();
-}
