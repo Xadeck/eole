@@ -1,4 +1,5 @@
 #include "xdk/eole/project.h"
+#include "xdk/eole/path.h"
 
 #include "absl/memory/memory.h"
 #include "absl/strings/match.h"
@@ -9,6 +10,7 @@
 
 namespace xdk {
 namespace eole {
+
 Project::Builder::Builder(absl::string_view rootpath) : rootpath_(rootpath) {}
 
 Project::Builder &
@@ -32,7 +34,7 @@ void Project::Builder::BuildDirectory(Directory *directory) const {
     if (filename == "." || filename == "..") {
       continue;
     }
-    const std::string filepath = absl::StrCat(directory->path, "/", filename);
+    const std::string filepath = Path::Join(directory->path, filename);
     struct stat filestat;
     (void)stat(filepath.c_str(), &filestat);
     if (S_ISDIR(filestat.st_mode)) {

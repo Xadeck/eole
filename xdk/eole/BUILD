@@ -14,11 +14,32 @@ cc_binary(
 )
 
 cc_library(
+    name = "path",
+    srcs = ["path.cc"],
+    hdrs = ["path.h"],
+    copts = COPTS,
+    deps = [
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_test(
+    name = "path_test",
+    srcs = ["path_test.cc"],
+    copts = COPTS,
+    deps = [
+        ":path",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "project",
     srcs = ["project.cc"],
     hdrs = ["project.h"],
     copts = COPTS,
     deps = [
+        ":path",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:optional",
