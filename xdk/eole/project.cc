@@ -21,7 +21,7 @@ void BuildDirectory(Project::Directory *directory) throw(std::system_error) {
   dirent *entry = nullptr;
   while ((entry = readdir(dir)) != nullptr) {
     const absl::string_view filename = entry->d_name;
-    if (filename == "." || filename == "..") {
+    if (absl::StartsWith(filename, ".")) {
       continue;
     }
     const std::string filepath = Path::Join(directory->path, filename);
