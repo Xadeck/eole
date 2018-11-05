@@ -29,7 +29,7 @@ public:
   };
 
   explicit Project(absl::string_view rootpath) throw(std::system_error);
-  const Directory *root() { return root_.get(); }
+  const Directory *root() const { return root_.get(); }
 
 private:
   std::unique_ptr<Directory> root_;
