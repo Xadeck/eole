@@ -13,17 +13,9 @@ namespace eole {
 class Project {
 public:
   struct File {
-    class Generator {
-    public:
-      virtual ~Generator() {}
-      virtual const char *Name() const = 0;
-      virtual bool CanGenerate(absl::string_view filepath) const = 0;
-    };
-    File(absl::string_view path, const Generator *generator)
-        : path(path), generator(generator) {}
+    File(absl::string_view path) : path(path) {}
 
     const std::string path;
-    const Generator *generator;
   };
 
   struct Directory {
@@ -34,23 +26,11 @@ public:
     std::vector<std::unique_ptr<Directory>> directories;
     std::vector<File> files;
   };
-  class Builder {
-  public:
-    explicit Builder(absl::string_view rootpath);
-    Builder &AddFileGenerator(const File::Generator *generator);
 
-    Project Build() const;
-
-  private:
-    void BuildDirectory(Directory *directory) const;
-    const std::string rootpath_;
-    std::vector<const File::Generator *> generators_;
-  };
-
+  explicit Project(absl::string_view rootpath);
   const Directory *root() { return root_.get(); }
 
 private:
-  friend class Builder;
   std::unique_ptr<Directory> root_;
 };
 } // namespace eole

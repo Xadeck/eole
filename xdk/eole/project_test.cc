@@ -11,24 +11,9 @@ namespace eole {
 namespace {
 using ::testing::ElementsAre;
 
-class MarkdownFileGenerator final : public Project::File::Generator {
-public:
-  const char *Name() const final { return "MD"; }
-  bool CanGenerate(absl::string_view filepath) const final {
-    return absl::EndsWith(filepath, ".md");
-  }
-};
-
-class ProjectTest : public ::testing::Test {
-protected:
-};
-
-TEST_F(ProjectTest, Works) {
-  std::string root =
-      absl::StrCat(std::getenv("TEST_SRCDIR"), "/xdk_eole/xdk/eole/testdata");
-  MarkdownFileGenerator markdown_file_generator;
-  Project project =
-      Project::Builder(root).AddFileGenerator(&markdown_file_generator).Build();
+TEST(ProjectTest, Works) {
+  Project project(
+      absl::StrCat(std::getenv("TEST_SRCDIR"), "/xdk_eole/xdk/eole/testdata"));
   // Use a local tree traversal to get the list of directories and files in the
   // project, in depth first manner. There is no need to add traversing function
   // to the Project::Directory class. It also allows to have expectations in the
@@ -47,8 +32,7 @@ TEST_F(ProjectTest, Works) {
         for (const auto &file : directory->files) {
           absl::string_view filepath = file.path;
           EXPECT_TRUE(absl::ConsumePrefix(&filepath, project.root()->path));
-          content.push_back(
-              absl::StrCat("file[", file.generator->Name(), "]:", filepath));
+          content.push_back(absl::StrCat("file:", filepath));
         }
         for (const auto &subdirectory : directory->directories) {
           traverse(subdirectory.get());
@@ -58,11 +42,12 @@ TEST_F(ProjectTest, Works) {
   EXPECT_THAT(content, ElementsAre("dir:",                     //
                                    "dir:/posts",               //
                                    "config:/posts/config.lua", //
-                                   "file[MD]:/posts/gtest.md", //
-                                   "file[MD]:/posts/absl.md",  //
-                                   "file[MD]:/posts/lua.md",   //
+                                   "file:/posts/gtest.md",     //
+                                   "file:/posts/absl.md",      //
+                                   "file:/posts/lua.md",       //
                                    "dir:/pages",               //
-                                   "file[MD]:/pages/about.md"  //
+                                   "file:/pages/TODO.txt",     //
+                                   "file:/pages/about.md"      //
                                    ));
 }
 
