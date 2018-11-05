@@ -51,6 +51,12 @@ TEST(ProjectTest, Works) {
                                    ));
 }
 
+TEST(ProjectTest, ExceptionIsThrownIfNotExisting) {
+  const auto &non_existent_path =
+      absl::StrCat(std::getenv("TEST_SRCDIR"), "/nonexistent");
+  ASSERT_THROW(Project project(non_existent_path), std::runtime_error);
+}
+
 } // namespace
 } // namespace eole
 } // namespace xdk

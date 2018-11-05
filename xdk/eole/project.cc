@@ -6,13 +6,18 @@
 #include "absl/strings/str_cat.h"
 #include <cstdlib>
 #include <dirent.h>
+#include <errno.h>
 #include <sys/stat.h>
 
 namespace xdk {
 namespace eole {
 namespace {
-void BuildDirectory(Project::Directory *directory) {
+void BuildDirectory(Project::Directory *directory) throw(std::system_error) {
   DIR *dir = opendir(directory->path.c_str());
+  if (dir == nullptr) {
+    throw std::system_error(errno, std::generic_category(),
+                            absl::StrCat("opendir(", directory->path, ")"));
+  }
   dirent *entry = nullptr;
   while ((entry = readdir(dir)) != nullptr) {
     const absl::string_view filename = entry->d_name;
@@ -21,7 +26,10 @@ void BuildDirectory(Project::Directory *directory) {
     }
     const std::string filepath = Path::Join(directory->path, filename);
     struct stat filestat;
-    (void)stat(filepath.c_str(), &filestat);
+    if (stat(filepath.c_str(), &filestat) == -1) {
+      throw std::system_error(errno, std::generic_category(),
+                              absl::StrCat("stat(", filepath, ")"));
+    }
     if (S_ISDIR(filestat.st_mode)) {
       auto subdirectory = absl::make_unique<Project::Directory>(filepath);
       BuildDirectory(subdirectory.get());
@@ -36,12 +44,15 @@ void BuildDirectory(Project::Directory *directory) {
       directory->files.emplace_back(filepath);
     }
   }
-  closedir(dir);
+  if (closedir(dir) == -1) {
+    throw std::system_error(errno, std::generic_category(),
+                            absl::StrCat("close(", directory->path, ")"));
+  }
 }
 
 } // namespace
 
-Project::Project(absl::string_view rootpath)
+Project::Project(absl::string_view rootpath) throw(std::system_error)
     : root_(absl::make_unique<Directory>(rootpath)) {
   BuildDirectory(root_.get());
 }

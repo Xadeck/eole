@@ -5,6 +5,7 @@
 #include "absl/types/optional.h"
 #include <memory>
 #include <string>
+#include <system_error>
 #include <vector>
 
 namespace xdk {
@@ -27,7 +28,7 @@ public:
     std::vector<File> files;
   };
 
-  explicit Project(absl::string_view rootpath);
+  explicit Project(absl::string_view rootpath) throw(std::system_error);
   const Directory *root() { return root_.get(); }
 
 private:
