@@ -2,9 +2,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 
 def dependencies():
     git_repository(
-        name = "xdk_ltemplate",
-        commit = "2fe4d99",
-        remote = "https://github.com/Xadeck/ltemplate.git",
+        name = "xdk_jude",
+        commit = "3e8f0a5",
+        remote = "https://github.com/Xadeck/jude.git",
     )
     new_git_repository(
         name = "cmark_gfm",

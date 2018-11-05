@@ -2,7 +2,7 @@
 #include "extensions/cmark-gfm-core-extensions.h"
 #include "src/cmark-gfm.h"
 #include "src/node.h"
-#include "xdk/ltemplate/ltemplate.h"
+#include "xdk/jude/do.h"
 #include "xdk/lua/lua.hpp"
 #include "xdk/lua/state.h"
 
@@ -13,8 +13,7 @@ int main(int argc, char **argv) {
   xdk::lua::State L;
   lua_newtable(L);
   absl::string_view source = argv[1];
-  if (int error =
-          xdk::ltemplate::dostring(L, source.data(), source.size(), "arg")) {
+  if (int error = xdk::jude::dostring(L, source.data(), source.size(), "arg")) {
     std::cerr << lua_tostring(L, -1) << "\n";
     return error;
   }

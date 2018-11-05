@@ -4,9 +4,9 @@ load("//:WORKSPACE.bzl", "dependencies")
 
 dependencies()
 
-load("@xdk_ltemplate//:WORKSPACE.bzl", xdk_ltemplate_dependencies = "dependencies")
+load("@xdk_jude//:WORKSPACE.bzl", xdk_jude_dependencies = "dependencies")
 
-xdk_ltemplate_dependencies()
+xdk_jude_dependencies()
 
 load("@xdk_lua//:WORKSPACE.bzl", xdk_lua_dependencies = "dependencies")
 

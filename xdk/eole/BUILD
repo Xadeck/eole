@@ -8,7 +8,7 @@ cc_binary(
         "@cmark_gfm//:cmark_extensions",
         "@cmark_gfm//:cmark_static",
         "@com_google_absl//absl/strings",
-        "@xdk_ltemplate//xdk/ltemplate",
+        "@xdk_jude//xdk/jude:do",
         "@xdk_lua//xdk/lua:state",
     ],
 )
