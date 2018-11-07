@@ -54,6 +54,30 @@ cc_test(
 )
 
 cc_library(
+    name = "fixture",
+    testonly = 1,
+    srcs = ["fixture.cc"],
+    hdrs = ["fixture.h"],
+    copts = COPTS,
+    deps = [
+        ":filesystem",
+        ":path",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
+cc_test(
+    name = "fixture_test",
+    srcs = ["fixture_test.cc"],
+    copts = COPTS,
+    deps = [
+        ":fixture",
+        ":path",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "project",
     srcs = ["project.cc"],
     hdrs = ["project.h"],
