@@ -25,7 +25,7 @@ TEST_F(FixtureTest, CanAddFile) {
   constexpr char relative_filepath[] = "foo/bar/baz.txt";
   fixture_.AddFile(relative_filepath, "some content");
 
-  std::ifstream ifs(fixture_.Filepath(relative_filepath));
+  std::ifstream ifs(fixture_.Path(relative_filepath));
   std::string content{std::istreambuf_iterator<char>(ifs),
                       std::istreambuf_iterator<char>()};
   EXPECT_EQ(content, "some content");

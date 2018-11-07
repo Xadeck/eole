@@ -63,7 +63,7 @@ TEST_F(ProjectTest, Works) {
 }
 
 TEST_F(ProjectTest, ExceptionIsThrownIfNotExisting) {
-  ASSERT_THROW(Project project(fixture_.Filepath("nonexistent")),
+  ASSERT_THROW(Project project(fixture_.Path("nonexistent")),
                std::runtime_error);
 }
 

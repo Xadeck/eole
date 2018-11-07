@@ -12,7 +12,7 @@ class Fixture {
 public:
   Fixture();
   const std::string &Dirpath() const { return dirpath_; }
-  std::string Filepath(absl::string_view relative_filepath) const;
+  std::string Path(absl::string_view relative_filepath) const;
 
   void AddFile(absl::string_view relative_filepath,
                absl::string_view content) const;
