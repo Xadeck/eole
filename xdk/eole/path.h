@@ -19,6 +19,9 @@ public:
                           const T &... args) {
     return Join(path1, Join(path2, args...));
   }
+
+  static absl::string_view Dirname(absl::string_view path);
+  static absl::string_view Basename(absl::string_view path);
 };
 } // namespace eole
 } // namespace xdk
