@@ -3,6 +3,7 @@
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/strip.h"
+#include "xdk/eole/fixture.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -11,9 +12,19 @@ namespace eole {
 namespace {
 using ::testing::ElementsAre;
 
-TEST(ProjectTest, Works) {
-  Project project(
-      absl::StrCat(std::getenv("TEST_SRCDIR"), "/xdk_eole/xdk/eole/testdata"));
+class ProjectTest : public ::testing::Test {
+protected:
+  Fixture fixture_;
+};
+
+TEST_F(ProjectTest, Works) {
+  fixture_.AddFile("pages/TODO.txt", "");
+  fixture_.AddFile("pages/about.md", "");
+  fixture_.AddFile("posts/absl.md", "");
+  fixture_.AddFile("posts/config.lua", "");
+  fixture_.AddFile("posts/gtest.md", "");
+  fixture_.AddFile("posts/lua.md", "");
+  Project project(fixture_.Dirpath());
   // Use a local tree traversal to get the list of directories and files in the
   // project, in depth first manner. There is no need to add traversing function
   // to the Project::Directory class. It also allows to have expectations in the
@@ -51,10 +62,9 @@ TEST(ProjectTest, Works) {
                                    ));
 }
 
-TEST(ProjectTest, ExceptionIsThrownIfNotExisting) {
-  const auto &non_existent_path =
-      absl::StrCat(std::getenv("TEST_SRCDIR"), "/nonexistent");
-  ASSERT_THROW(Project project(non_existent_path), std::runtime_error);
+TEST_F(ProjectTest, ExceptionIsThrownIfNotExisting) {
+  ASSERT_THROW(Project project(fixture_.Filepath("nonexistent")),
+               std::runtime_error);
 }
 
 } // namespace

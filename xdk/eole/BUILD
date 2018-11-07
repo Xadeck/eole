@@ -94,8 +94,8 @@ cc_test(
     name = "project_test",
     srcs = ["project_test.cc"],
     copts = COPTS,
-    data = glob(["testdata/**"]),
     deps = [
+        ":fixture",
         ":project",
         "@com_google_googletest//:gtest_main",
     ],
