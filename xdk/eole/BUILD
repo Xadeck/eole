@@ -34,6 +34,26 @@ cc_test(
 )
 
 cc_library(
+    name = "filesystem",
+    srcs = ["filesystem.cc"],
+    hdrs = ["filesystem.h"],
+    copts = COPTS,
+    deps = [
+        ":path",
+    ],
+)
+
+cc_test(
+    name = "filesystem_test",
+    srcs = ["filesystem_test.cc"],
+    copts = COPTS,
+    deps = [
+        ":filesystem",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "project",
     srcs = ["project.cc"],
     hdrs = ["project.h"],
