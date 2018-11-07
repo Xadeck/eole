@@ -14,7 +14,7 @@ namespace {
 TEST(FilesystemTest, WorksRecursively) {
   const std::string &dirpath =
       Path::Join(std::getenv("TEST_TMPDIR"), "dir/and/subdir");
-  Mkdir(dirpath);
+  Filesystem::Mkdir(dirpath);
   // Check that a file can be written.
   const auto &filepath = Path::Join(dirpath, "file.txt");
   {

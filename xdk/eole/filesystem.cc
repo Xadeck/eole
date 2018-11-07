@@ -9,7 +9,7 @@
 namespace xdk {
 namespace eole {
 
-void Mkdir(absl::string_view dirpath) throw(std::system_error) {
+void Filesystem::Mkdir(absl::string_view dirpath) throw(std::system_error) {
   if (dirpath == "/" || dirpath.empty()) {
     return;
   }

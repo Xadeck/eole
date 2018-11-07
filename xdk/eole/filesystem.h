@@ -7,7 +7,10 @@
 namespace xdk {
 namespace eole {
 
-void Mkdir(absl::string_view dirpath) throw(std::system_error);
+class Filesystem {
+public:
+  static void Mkdir(absl::string_view dirpath) throw(std::system_error);
+};
 
 } // namespace eole
 } // namespace xdk
