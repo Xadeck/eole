@@ -87,6 +87,8 @@ cc_library(
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:optional",
+        "@lua",
+        "@xdk_lua//xdk/lua:sandbox",
     ],
 )
 
@@ -98,5 +100,8 @@ cc_test(
         ":fixture",
         ":project",
         "@com_google_googletest//:gtest_main",
+        "@xdk_lua//xdk/lua:matchers",
+        "@xdk_lua//xdk/lua:stack",
+        "@xdk_lua//xdk/lua:state",
     ],
 )

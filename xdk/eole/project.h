@@ -2,7 +2,7 @@
 #define XDK_EOLE_PROJECT_H
 
 #include "absl/strings/string_view.h"
-#include "absl/types/optional.h"
+#include "xdk/lua/lua.hpp"
 #include <memory>
 #include <string>
 #include <system_error>
@@ -14,7 +14,7 @@ namespace eole {
 class Project {
 public:
   struct File {
-    File(absl::string_view path) : path(path) {}
+    explicit File(absl::string_view path) : path(path) {}
 
     const std::string path;
   };
@@ -23,12 +23,11 @@ public:
     explicit Directory(absl::string_view path) : path(path) {}
     const std::string path;
 
-    absl::optional<std::string> config;
     std::vector<std::unique_ptr<Directory>> directories;
     std::vector<File> files;
   };
 
-  explicit Project(absl::string_view rootpath) throw(std::system_error);
+  Project(lua_State *L, absl::string_view rootpath) throw(std::system_error);
   const Directory *root() const { return root_.get(); }
 
 private:
