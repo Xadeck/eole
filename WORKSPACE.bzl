@@ -3,7 +3,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 def dependencies():
     git_repository(
         name = "xdk_jude",
-        commit = "57b9f79",
+        commit = "bb35cb2",
         remote = "https://github.com/Xadeck/jude.git",
     )
     new_git_repository(
