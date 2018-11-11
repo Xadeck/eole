@@ -38,13 +38,13 @@ TEST_F(SiteTest, ExceptionIsThrownIfNotExisting) {
 TEST_F(SiteTest, ConfigAreExecuted) {
   // Define a global variable.
   lua_newtable(L);
-  lua_setfield(L, -2, "site");
+  lua_setfield(L, -2, "global");
   // Execute a site that sets a global global variable and a local variable.
-  fixture_.AddFile("site.lua", R"LUA(site.name = "Good" name = "Bad")LUA");
+  fixture_.AddFile("site.lua", R"LUA(global.name = "Good" name = "Bad")LUA");
   Site::Build(L, fixture_.Dirpath());
   // Check that `site` is indeed set but not `name`.
   EXPECT_THAT(lua::Stack::Element(L, -1),
-              HasField("site", HasField("name", IsString("Good"))));
+              HasField("global", HasField("name", IsString("Good"))));
   EXPECT_THAT(lua::Stack::Element(L, -1), HasField("name", IsNil()));
 }
 
@@ -57,6 +57,7 @@ TEST_F(SiteTest, FilesAreBuilt) {
   EXPECT_THAT(fixture_, HasFile("_/three.md", "three = 3"));
   EXPECT_THAT(fixture_, HasFile("_/four.md", "four = 4"));
 }
+
 } // namespace
 } // namespace eole
 } // namespace xdk
