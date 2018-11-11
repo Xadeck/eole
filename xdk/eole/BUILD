@@ -1,7 +1,7 @@
 load("//:WORKSPACE.bzl", "COPTS")
 
 cc_binary(
-    name = "eole",
+    name = "main",
     srcs = ["main.cc"],
     copts = COPTS,
     deps = [
@@ -104,6 +104,16 @@ cc_test(
         "@com_google_googletest//:gtest_main",
         "@xdk_lua//xdk/lua:matchers",
         "@xdk_lua//xdk/lua:stack",
+        "@xdk_lua//xdk/lua:state",
+    ],
+)
+
+cc_binary(
+    name = "eole",
+    srcs = ["eole.cc"],
+    copts = COPTS,
+    deps = [
+        ":site",
         "@xdk_lua//xdk/lua:state",
     ],
 )
