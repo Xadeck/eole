@@ -78,27 +78,29 @@ cc_test(
 )
 
 cc_library(
-    name = "project",
-    srcs = ["project.cc"],
-    hdrs = ["project.h"],
+    name = "site",
+    srcs = ["site.cc"],
+    hdrs = ["site.h"],
     copts = COPTS,
     deps = [
+        ":filesystem",
         ":path",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:optional",
         "@lua",
+        "@xdk_jude//xdk/jude:do",
         "@xdk_lua//xdk/lua:sandbox",
     ],
 )
 
 cc_test(
-    name = "project_test",
-    srcs = ["project_test.cc"],
+    name = "site_test",
+    srcs = ["site_test.cc"],
     copts = COPTS,
     deps = [
         ":fixture",
-        ":project",
+        ":site",
         "@com_google_googletest//:gtest_main",
         "@xdk_lua//xdk/lua:matchers",
         "@xdk_lua//xdk/lua:stack",
