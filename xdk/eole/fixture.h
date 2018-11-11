@@ -4,6 +4,7 @@
 #include <string>
 
 #include "absl/strings/string_view.h"
+#include "gmock/gmock.h"
 
 namespace xdk {
 namespace eole {
@@ -18,8 +19,14 @@ public:
                absl::string_view content) const;
 
 private:
-  std::string dirpath_;
+  friend std::ostream &operator<<(std::ostream &os, const Fixture &fixture);
+  const std::string name_;
+  const std::string dirpath_;
 };
+
+::testing::Matcher<const Fixture &>
+HasFile(absl::string_view relative_path,
+        ::testing::Matcher<absl::string_view> matcher);
 
 } // namespace eole
 } // namespace xdk
