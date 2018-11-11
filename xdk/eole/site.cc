@@ -23,10 +23,14 @@ struct Builder {
   std::string src_path;
   std::string dst_path;
 
-  void BuildDirectory(lua_State *L,
-                      const std::string &rel_path) throw(std::system_error) {
+  void BuildDirectory(lua_State *L, const std::string &rel_path) const
+      throw(std::system_error) {
     // Create a sandbox around the table at the top of the stack.
+    // Adds a `directory` table so that site file, if any, can surface data.
     lua::newsandbox(L, -1);
+    lua_pushliteral(L, "site");
+    lua_newtable(L);
+    lua_rawset(L, -3);
     // If a site file exists, then execute it, stopping upon errors.
     // The execution will populate sandbox.
     const std::string site_rel_path = Path::Join(rel_path, kSiteName);
@@ -79,11 +83,8 @@ struct Builder {
     lua_pop(L, 1);
   }
 
-  void BuildFile(lua_State *L, const std::string &rel_path) {
-    const std::string path = Path::Join(src_path, rel_path);
-    std::ifstream ifs(path);
-    const std::string source{std::istreambuf_iterator<char>(ifs),
-                             std::istreambuf_iterator<char>()};
+  void BuildFile(lua_State *L, const std::string &rel_path) const {
+    const std::string source = Input(rel_path);
     // On the stack should be the sandbox for the directory.
     // It is readonly for dostring.
     if (int error =
@@ -98,7 +99,14 @@ struct Builder {
     lua_pop(L, 2);
   }
 
-  void Output(absl::string_view rel_path, absl::string_view contents) {
+  std::string Input(absl::string_view rel_path) const {
+    const std::string path = Path::Join(src_path, rel_path);
+    std::ifstream ifs(path);
+    return std::string{std::istreambuf_iterator<char>(ifs),
+                       std::istreambuf_iterator<char>()};
+  }
+
+  void Output(absl::string_view rel_path, absl::string_view contents) const {
     const std::string path = Path::Join(dst_path, rel_path);
     Filesystem::Mkdir(Path::Dirname(path));
     std::fstream fs(path, fs.binary | fs.trunc | fs.out);
@@ -109,7 +117,8 @@ struct Builder {
 } // namespace
 
 void Site::Build(lua_State *L,
-                 absl::string_view root_path) throw(std::system_error) {
+                 absl::string_view root_path) throw(std::system_error,
+                                                    std::runtime_error) {
   Builder builder;
   builder.src_path = std::string(root_path);
   builder.dst_path = Path::Join(root_path, kDstName);

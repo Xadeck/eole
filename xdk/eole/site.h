@@ -14,7 +14,8 @@ namespace eole {
 class Site {
 public:
   static void Build(lua_State *L,
-                    absl::string_view root_path) throw(std::system_error);
+                    absl::string_view root_path) throw(std::system_error,
+                                                       std::runtime_error);
 };
 
 } // namespace eole
