@@ -48,8 +48,13 @@ TEST_F(FilesystemTest, LsDirWorks) {
 TEST_F(FilesystemTest, WriteReadWork) {
   Filesystem::Mkdir(tmp_);
   const std::string path = Path::Join(tmp_, "test.txt");
-  Filesystem::Write(path, "some random content");
-  EXPECT_THAT(Filesystem::Read(path), "some random content");
+  constexpr char content[] = R"(
+    some randome content
+    on multiple lines
+    to see how it works.)";
+
+  Filesystem::Write(path, content);
+  EXPECT_THAT(Filesystem::Read(path), content);
 }
 
 } // namespace
