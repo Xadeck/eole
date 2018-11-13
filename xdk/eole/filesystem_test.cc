@@ -15,7 +15,7 @@ using ::testing::UnorderedElementsAre;
 
 class FilesystemTest : public ::testing::Test {
 public:
-  std::string tmp_ =
+  const std::string tmp_ =
       Path::Join(std::getenv("TEST_TMPDIR"),
                  UnitTest::GetInstance()->current_test_info()->name());
 };
@@ -43,6 +43,13 @@ TEST_F(FilesystemTest, LsDirWorks) {
   const auto listing = Filesystem::LsDir(tmp_);
   EXPECT_THAT(listing.directories, UnorderedElementsAre("subdirA", "subdirB"));
   EXPECT_THAT(listing.files, UnorderedElementsAre("file1.txt", "file2.txt"));
+}
+
+TEST_F(FilesystemTest, WriteReadWork) {
+  Filesystem::Mkdir(tmp_);
+  const std::string path = Path::Join(tmp_, "test.txt");
+  Filesystem::Write(path, "some random content");
+  EXPECT_THAT(Filesystem::Read(path), "some random content");
 }
 
 } // namespace

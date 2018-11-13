@@ -16,8 +16,11 @@ public:
     std::set<std::string> files;
   };
   static void Mkdir(absl::string_view dirpath) throw(std::system_error);
-  // Follows symlinks. Return sorted listing.
+  // Follows symlinks. Return listing of dirnames and filenames.
   static Listing LsDir(absl::string_view dirpath) throw(std::system_error);
+
+  static void Write(const std::string &filepath, absl::string_view content);
+  static std::string Read(const std::string &filepath);
 };
 
 } // namespace eole

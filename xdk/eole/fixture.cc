@@ -1,7 +1,6 @@
 #include "xdk/eole/fixture.h"
 
 #include <dirent.h>
-#include <fstream>
 
 #include "xdk/eole/filesystem.h"
 #include "xdk/eole/path.h"
@@ -50,10 +49,7 @@ struct HasFileMatcher final
       return false;
     }
 
-    std::ifstream ifs(path);
-    const std::string content{std::istreambuf_iterator<char>(ifs),
-                              std::istreambuf_iterator<char>()};
-    return matcher.MatchAndExplain(content, result_listener);
+    return matcher.MatchAndExplain(Filesystem::Read(path), result_listener);
   }
 };
 } // namespace
@@ -72,7 +68,7 @@ void Fixture::AddFile(absl::string_view relative_filepath,
                       absl::string_view content) const {
   const auto filepath = Path(relative_filepath);
   Filesystem::Mkdir(Path::Dirname(filepath));
-  std::ofstream(filepath) << content;
+  Filesystem::Write(filepath, content);
 }
 
 std::ostream &operator<<(std::ostream &os, const Fixture &fixture) {

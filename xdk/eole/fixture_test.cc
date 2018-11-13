@@ -1,7 +1,6 @@
 #include "xdk/eole/fixture.h"
 
-#include <fstream>
-
+#include "xdk/eole/filesystem.h"
 #include "xdk/eole/path.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest-spi.h"
@@ -28,10 +27,7 @@ TEST_F(FixtureTest, CanAddFile) {
   const std::string relative_filepath = Path::Join("foo", "bar", "baz.txt");
   fixture_.AddFile(relative_filepath, "some content");
 
-  std::ifstream ifs(fixture_.Path(relative_filepath));
-  std::string content{std::istreambuf_iterator<char>(ifs),
-                      std::istreambuf_iterator<char>()};
-  EXPECT_EQ(content, "some content");
+  EXPECT_EQ(Filesystem::Read(fixture_.Path(relative_filepath)), "some content");
 }
 
 TEST_F(FixtureTest, HasFileSuccess) {

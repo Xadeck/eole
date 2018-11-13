@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <dirent.h>
 #include <errno.h>
+#include <fstream>
 #include <sys/stat.h>
 
 namespace xdk {
@@ -57,6 +58,16 @@ Filesystem::LsDir(absl::string_view path) throw(std::system_error) {
                             absl::StrCat("close(", path, ")"));
   }
   return listing;
+}
+
+void Filesystem::Write(const std::string &filepath, absl::string_view content) {
+  std::ofstream(filepath) << content;
+}
+
+std::string Filesystem::Read(const std::string &filepath) {
+  std::ifstream ifs(filepath);
+  return std::string(std::istreambuf_iterator<char>(ifs),
+                     std::istreambuf_iterator<char>());
 }
 
 } // namespace eole

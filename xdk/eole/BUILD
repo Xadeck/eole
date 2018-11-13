@@ -71,6 +71,7 @@ cc_test(
     srcs = ["fixture_test.cc"],
     copts = COPTS,
     deps = [
+        ":filesystem",
         ":fixture",
         ":path",
         "@com_google_googletest//:gtest_main",
