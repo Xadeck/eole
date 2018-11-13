@@ -78,14 +78,14 @@ TEST_F(SiteTest, SandboxMechanismWorks) {
   // Check that global environment was not polluted.
   EXPECT_THAT(lua::Stack::Element(L, -1), HasField("version", IsNumber(1)));
   // Check that files were written with expected content.
-  EXPECT_THAT(Filesystem::Read(fixture_.Path("_/subdir/fileA.md")),
-              StrEq("    # Site . for test"
-                    "    I wish version was 3 instead of 1.0"
-                    "    and banner was three instead of ./subdir@1.0"));
-  EXPECT_THAT(Filesystem::Read(fixture_.Path("_/subdir/fileB.md")),
-              StrEq("    # Site . for test"
-                    "    I wish version was 7 instead of 1.0"
-                    "    and banner was seven instead of ./subdir@1.0"));
+  EXPECT_THAT(Filesystem::Read(fixture_.Path("_/subdir/fileA.md")), StrEq(R"(
+    # Site . for test
+    I wish version was 3 instead of 1.0
+    and banner was three instead of ./subdir@1.0)"));
+  EXPECT_THAT(Filesystem::Read(fixture_.Path("_/subdir/fileB.md")), StrEq(R"(
+    # Site . for test
+    I wish version was 7 instead of 1.0
+    and banner was seven instead of ./subdir@1.0)"));
 
   EXPECT_THAT(Filesystem::Read(fixture_.Path("_/fileC.md")),
               StrEq("path = ./fileC.md"));
