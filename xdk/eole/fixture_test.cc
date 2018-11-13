@@ -20,31 +20,30 @@ public:
 
 TEST_F(FixtureTest, ContainsCurrentTestInfo) {
   EXPECT_THAT(fixture_.Dirpath(),
-              EndsWith(Path::Join("FixtureTest", "ContainsCurrentTestInfo")));
+              EndsWith("FixtureTest/ContainsCurrentTestInfo"));
 }
 
 TEST_F(FixtureTest, CanAddFile) {
-  const std::string relative_filepath = Path::Join("foo", "bar", "baz.txt");
+  const std::string relative_filepath = "foo/bar/baz.txt";
   fixture_.AddFile(relative_filepath, "some content");
 
   EXPECT_EQ(Filesystem::Read(fixture_.Path(relative_filepath)), "some content");
 }
 
 TEST_F(FixtureTest, HasFileSuccess) {
-  fixture_.AddFile(Path::Join("foo", "bar.txt"), "the content");
+  fixture_.AddFile("foo/bar.txt", "the content");
 
   EXPECT_THAT(fixture_, Not(HasFile("bar.txt", "not the content")));
-  EXPECT_THAT(fixture_, HasFile(Path::Join("foo", "bar.txt"), "the content"));
-  EXPECT_THAT(fixture_,
-              HasFile(Path::Join("foo", "bar.txt"), HasSubstr("content")));
-  EXPECT_THAT(fixture_, HasFile(Path::Join("foo", "bar.txt"), _));
-  EXPECT_THAT(fixture_, Not(HasFile(Path::Join("foo", "baz.txt"), _)));
+  EXPECT_THAT(fixture_, HasFile("foo/bar.txt", "the content"));
+  EXPECT_THAT(fixture_, HasFile("foo/bar.txt", HasSubstr("content")));
+  EXPECT_THAT(fixture_, HasFile("foo/bar.txt", _));
+  EXPECT_THAT(fixture_, Not(HasFile("foo/baz.txt", _)));
   EXPECT_THAT(fixture_, Not(HasFile("foo", _)));
 }
 
 TEST_F(FixtureTest, HasFileFailure) {
-  const std::string &foo_bar = Path::Join("foo", "bar.txt");
-  const std::string &foo_baz = Path::Join("foo", "baz.txt");
+  const std::string &foo_bar = "foo/bar.txt";
+  const std::string &foo_baz = "foo/baz.txt";
   fixture_.AddFile(foo_bar, "the content");
 
   // Test matchers on content.
