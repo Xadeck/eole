@@ -25,7 +25,7 @@ TEST_F(FixtureTest, ContainsCurrentTestInfo) {
 }
 
 TEST_F(FixtureTest, CanAddFile) {
-  constexpr char relative_filepath[] = "foo/bar/baz.txt";
+  const std::string relative_filepath = Path::Join("foo", "bar", "baz.txt");
   fixture_.AddFile(relative_filepath, "some content");
 
   std::ifstream ifs(fixture_.Path(relative_filepath));
@@ -35,29 +35,32 @@ TEST_F(FixtureTest, CanAddFile) {
 }
 
 TEST_F(FixtureTest, HasFileSuccess) {
-  fixture_.AddFile("foo/bar.txt", "the content");
+  fixture_.AddFile(Path::Join("foo", "bar.txt"), "the content");
 
   EXPECT_THAT(fixture_, Not(HasFile("bar.txt", "not the content")));
-  EXPECT_THAT(fixture_, HasFile("foo/bar.txt", "the content"));
-  EXPECT_THAT(fixture_, HasFile("foo/bar.txt", HasSubstr("content")));
-  EXPECT_THAT(fixture_, HasFile("foo/bar.txt", _));
-  EXPECT_THAT(fixture_, Not(HasFile("foo/baz.txt", _)));
+  EXPECT_THAT(fixture_, HasFile(Path::Join("foo", "bar.txt"), "the content"));
+  EXPECT_THAT(fixture_,
+              HasFile(Path::Join("foo", "bar.txt"), HasSubstr("content")));
+  EXPECT_THAT(fixture_, HasFile(Path::Join("foo", "bar.txt"), _));
+  EXPECT_THAT(fixture_, Not(HasFile(Path::Join("foo", "baz.txt"), _)));
   EXPECT_THAT(fixture_, Not(HasFile("foo", _)));
 }
 
 TEST_F(FixtureTest, HasFileFailure) {
-  fixture_.AddFile("foo/bar.txt", "the content");
+  const std::string &foo_bar = Path::Join("foo", "bar.txt");
+  const std::string &foo_baz = Path::Join("foo", "baz.txt");
+  fixture_.AddFile(foo_bar, "the content");
 
   // Test matchers on content.
   EXPECT_NONFATAL_FAILURE(
-      EXPECT_THAT(fixture_, HasFile("foo/bar.txt", "not the content")),
+      EXPECT_THAT(fixture_, HasFile(foo_bar, "not the content")),
       R"(Expected: has file 'foo/bar.txt' whose content is equal to "not the content")");
   EXPECT_NONFATAL_FAILURE(
-      EXPECT_THAT(fixture_, Not(HasFile("foo/bar.txt", "the content"))),
+      EXPECT_THAT(fixture_, Not(HasFile(foo_bar, "the content"))),
       R"(Expected: hasn't file 'foo/bar.txt' or its content isn't equal to "the content")");
   // Test matcher on non existing file.
   EXPECT_NONFATAL_FAILURE(
-      EXPECT_THAT(fixture_, HasFile("foo/baz.txt", "the content")),
+      EXPECT_THAT(fixture_, HasFile(foo_baz, "the content")),
       R"(Actual: Fixture($TEST_TMPDIR/FixtureTest/HasFileFailure) (of type xdk::eole::Fixture), where 'foo/baz.txt' doesn't exist)");
   // Test matcher on existing directory.
   EXPECT_NONFATAL_FAILURE(

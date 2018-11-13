@@ -72,8 +72,7 @@ void Fixture::AddFile(absl::string_view relative_filepath,
                       absl::string_view content) const {
   const auto filepath = Path(relative_filepath);
   Filesystem::Mkdir(Path::Dirname(filepath));
-  std::fstream fs(filepath, fs.binary | fs.trunc | fs.out);
-  fs << content;
+  std::ofstream(filepath) << content;
 }
 
 std::ostream &operator<<(std::ostream &os, const Fixture &fixture) {
