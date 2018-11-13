@@ -26,16 +26,16 @@ struct Builder {
   void BuildDirectory(lua_State *L, const std::string &rel_path) const
       throw(std::system_error) {
     const std::string path = Path::Join(src_path, rel_path);
-    // Create a sandbox around the table at the top of the stack.
-    // Adds a `site` table so that site file, if any, can surface data.
+    // Create a sandbox around the table at the top of the stack,
+    // with path available as a variable.
     lua::newsandbox(L, -1);
-    lua_pushliteral(L, "site");
-    lua_newtable(L);
+    lua_pushliteral(L, "path");
+    lua_pushstring(L, rel_path.c_str());
     lua_rawset(L, -3);
     // Get list of directories and files first.
     const auto listing = Filesystem::LsDir(path);
     // If a site file exists, then execute it, stopping upon errors.
-    // The execution will populate sandbox.
+    // The execution thus has access to path and will populate sandbox.
     if (listing.files.find(kSiteName) != listing.files.end()) {
       // TODO: pass the relname for error messages.
       if (int error = luaL_loadfile(L, Path::Join(path, kSiteName).c_str())) {
@@ -47,7 +47,8 @@ struct Builder {
         throw std::runtime_error(lua_tostring(L, -1));
       }
     }
-    // Then process every file in unspecified order.
+    // Then process every file in unspecified order intentionally so that there
+    // is no temptation to rely on order, since we may parallelize later.
     for (const auto &file : listing.files) {
       BuildFile(L, Path::Join(rel_path, file));
     }
@@ -59,12 +60,18 @@ struct Builder {
 
   void BuildFile(lua_State *L, const std::string &rel_path) const {
     const std::string source = Filesystem::Read(Path::Join(src_path, rel_path));
-    // On the stack should be the sandbox for the directory.
-    // It is readonly for dostring.
+    // On the stack should be the sandbox for the directory.  Add a sandbox
+    // around it, with path available as a variable (thus overriding that of
+    // directory).
+    lua::newsandbox(L, -1);
+    lua_pushliteral(L, "path");
+    lua_pushstring(L, rel_path.c_str());
+    lua_rawset(L, -3);
     if (int error =
             jude::dostring(L, source.data(), source.size(), rel_path.c_str())) {
       throw std::runtime_error(lua_tostring(L, -1));
     }
+    // On the stack there is the sandbox and the blocks table.
     // Get the unamed block and save it.
     lua_getfield(L, -1, kDstName);
     if (lua_isstring(L, -1)) {
@@ -72,7 +79,7 @@ struct Builder {
       Filesystem::Mkdir(Path::Dirname(path));
       Filesystem::Write(path, lua_tostring(L, -1));
     }
-    lua_pop(L, 2);
+    lua_pop(L, 3); // sandbox, blocks, unammed block.
   }
 };
 
