@@ -46,7 +46,6 @@ TEST_F(SiteTest, FilesAreBuilt) {
 
 TEST_F(SiteTest, SandboxMechanismWorks) {
   // Global environment.
-  lua_newtable(L);
   lua_pushnumber(L, 1);
   lua_setfield(L, -2, "version");
   // Site configuration. It has access to global environment.  All variables
@@ -89,6 +88,28 @@ TEST_F(SiteTest, SandboxMechanismWorks) {
 
   EXPECT_THAT(Filesystem::Read(fixture_.Path("_/fileC.md")),
               StrEq("path = ./fileC.md"));
+}
+
+TEST_F(SiteTest, ExtendWorks) {
+  fixture_.AddFile("layouts/final.html", R"(<html>
+<body>{{ getblock() }}</body>
+</html>)");
+  fixture_.AddFile("layouts/intermediate.html", R"(
+{%  extend('layouts/final.html') %}
+<h1>Title</h1>
+<div>{{ getblock() }}</div>
+</html>)");
+  fixture_.AddFile("posts/page.md", "{% extend('layouts/intermediate.html') %}"
+                                    "This is the page.");
+  Site::Build(L, fixture_.Dirpath());
+  EXPECT_THAT(Filesystem::Read(fixture_.Path("_/posts/page.md")),
+              StrEq(R"(<html>
+<body>
+
+<h1>Title</h1>
+<div>This is the page.</div>
+</html></body>
+</html>)"));
 }
 
 } // namespace

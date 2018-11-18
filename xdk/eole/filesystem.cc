@@ -64,6 +64,7 @@ void Filesystem::Write(const std::string &filepath, absl::string_view content) {
   std::ofstream(filepath) << content;
 }
 
+// TODO: throw an exception if does not exist.
 std::string Filesystem::Read(const std::string &filepath) {
   std::ifstream ifs(filepath);
   return std::string(std::istreambuf_iterator<char>(ifs),

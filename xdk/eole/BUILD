@@ -91,6 +91,8 @@ cc_library(
         "@com_google_absl//absl/types:optional",
         "@lua",
         "@xdk_jude//xdk/jude:do",
+        "@xdk_lua//xdk/lua:popper",
+        "@xdk_lua//xdk/lua:rawfield",
         "@xdk_lua//xdk/lua:sandbox",
     ],
 )

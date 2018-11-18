@@ -2,9 +2,12 @@
 #include "absl/memory/memory.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
+#include "absl/types/optional.h"
 #include "xdk/eole/filesystem.h"
 #include "xdk/eole/path.h"
 #include "xdk/jude/do.h"
+#include "xdk/lua/popper.h"
+#include "xdk/lua/rawfield.h"
 #include "xdk/lua/sandbox.h"
 #include <cstdlib>
 #include <dirent.h>
@@ -18,6 +21,26 @@ namespace eole {
 namespace {
 constexpr char kDstName[] = "_";
 constexpr char kSiteName[] = "site.lua";
+constexpr char kPath[] = "path";
+
+int getblock(lua_State *L) {
+  if (lua_gettop(L) == 0) {
+    // TODO: find a way to share that constant with jude.
+    lua_pushstring(L, "_");
+  }
+  luaL_checkstring(L, -1);
+  lua_pushvalue(L, lua_upvalueindex(1));
+  lua_insert(L, -2);
+  lua_rawget(L, -2);
+  return 1;
+}
+
+int extend(lua_State *L) {
+  auto *next = reinterpret_cast<absl::optional<std::string> *>(
+      lua_touserdata(L, lua_upvalueindex(1)));
+  *next = luaL_checkstring(L, -1);
+  return 0;
+}
 
 struct Builder {
   std::string src_path;
@@ -29,9 +52,7 @@ struct Builder {
     // Create a sandbox around the table at the top of the stack,
     // with path available as a variable.
     lua::newsandbox(L, -1);
-    lua_pushliteral(L, "path");
-    lua_pushstring(L, rel_path.c_str());
-    lua_rawset(L, -3);
+    lua::rawsetfieldstring(L, -2, kPath, rel_path.c_str());
     // Get list of directories and files first.
     const auto listing = Filesystem::LsDir(path);
     // If a site file exists, then execute it, stopping upon errors.
@@ -47,8 +68,9 @@ struct Builder {
         throw std::runtime_error(lua_tostring(L, -1));
       }
     }
-    // Then process every file in unspecified order intentionally so that there
-    // is no temptation to rely on order, since we may parallelize later.
+    // Then process every file in unspecified order intentionally so that
+    // there is no temptation to rely on order, since we may parallelize
+    // later.
     for (const auto &file : listing.files) {
       BuildFile(L, Path::Join(rel_path, file));
     }
@@ -59,19 +81,33 @@ struct Builder {
   }
 
   void BuildFile(lua_State *L, const std::string &rel_path) const {
-    const std::string source = Filesystem::Read(Path::Join(src_path, rel_path));
     // On the stack should be the sandbox for the directory.  Add a sandbox
     // around it, with path available as a variable (thus overriding that of
     // directory).
     lua::newsandbox(L, -1);
-    lua_pushliteral(L, "path");
-    lua_pushstring(L, rel_path.c_str());
-    lua_rawset(L, -3);
-    if (int error =
-            jude::dostring(L, source.data(), source.size(), rel_path.c_str())) {
-      throw std::runtime_error(lua_tostring(L, -1));
+    lua::rawsetfieldstring(L, -1, kPath, rel_path.c_str());
+    // Start with an empty set of blocks.
+    lua_newtable(L);
+    for (absl::optional<std::string> next = rel_path; next;) {
+      // Read the file first, so `next` is no longer needed.
+      const auto source = std::make_pair(ReadFile(*next), *next);
+      // Set getblock to use the blocks table.
+      lua_pushcclosure(L, getblock, 1);
+      lua::rawsetfield(L, -2, "getblock");
+      // Reset `next` and set `extend` to be able to set it again.
+      next = absl::nullopt;
+      lua_pushlightuserdata(L, &next);
+      lua_pushcclosure(L, extend, 1);
+      lua::rawsetfield(L, -2, "extend");
+      // Execute the source, which may or not reset `next`.  After, the
+      // stack has again the sandbox and the (new) blocks table), so the loop
+      // can continue if needed.
+      if (int error =
+              jude::dostring(L, source.first.data(), source.first.size(),
+                             source.second.c_str())) {
+        throw std::runtime_error(lua_tostring(L, -1));
+      }
     }
-    // On the stack there is the sandbox and the blocks table.
     // Get the unamed block and save it.
     lua_getfield(L, -1, kDstName);
     if (lua_isstring(L, -1)) {
@@ -80,6 +116,10 @@ struct Builder {
       Filesystem::Write(path, lua_tostring(L, -1));
     }
     lua_pop(L, 3); // sandbox, blocks, unammed block.
+  }
+
+  std::string ReadFile(const std::string &rel_path) const {
+    return Filesystem::Read(Path::Join(src_path, rel_path));
   }
 };
 
