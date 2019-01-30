@@ -6,7 +6,6 @@
 #include "xdk/eole/filesystem.h"
 #include "xdk/eole/path.h"
 #include "xdk/jude/do.h"
-#include "xdk/lua/popper.h"
 #include "xdk/lua/rawfield.h"
 #include "xdk/lua/sandbox.h"
 #include <cstdlib>
