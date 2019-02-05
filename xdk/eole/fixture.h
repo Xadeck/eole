@@ -9,6 +9,9 @@
 namespace xdk {
 namespace eole {
 
+// Fixture represents a way to create a file hierarchy under TEST_TMPDIR
+// directory, in a bazel test. A fixture is unique per TEST/TEST_F case. It is
+// initially empty, and gets deleted at the end of the case.
 class Fixture {
 public:
   Fixture();

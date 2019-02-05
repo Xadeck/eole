@@ -13,6 +13,8 @@ namespace eole {
 
 class Site {
 public:
+  // Evaluate every file as a jude function and output the result under _
+  // subdirectory.
   static void Build(lua_State *L,
                     absl::string_view root_path) throw(std::system_error,
                                                        std::runtime_error);

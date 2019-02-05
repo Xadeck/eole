@@ -9,6 +9,7 @@
 namespace xdk {
 namespace eole {
 
+// Encapsulation of filesystem operations.
 class Filesystem {
 public:
   struct Listing {
